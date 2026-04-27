@@ -29,6 +29,9 @@ public class visit_detail_POJO {
         @SerializedName("customer_name")
         @Expose
         private String customerName;
+        @SerializedName("is_site_completed")
+        @Expose
+        private String isSiteCompleted;
         @SerializedName("customer_dob")
         @Expose
         private String customerDob;
@@ -81,6 +84,12 @@ public class visit_detail_POJO {
         @Expose
         private List<NextVisit> nextVisit = null;
 
+        public String getIsSiteCompleted() {
+            return isSiteCompleted;
+        }
+        public void setIsSiteCompleted(String siteCompleted) {
+            this.isSiteCompleted = siteCompleted;
+        }
         public String getVisitDate() {
             return visitDate;
         }
@@ -274,6 +283,10 @@ public class visit_detail_POJO {
         @SerializedName("product_name")
         @Expose
         private String productName;
+
+        @SerializedName("is_product_converted")
+        @Expose
+        private String isproductconverted;
         @SerializedName("product_id")
         @Expose
         private String productId;
@@ -304,6 +317,9 @@ public class visit_detail_POJO {
 
         public String getProductName() {
             return productName;
+        }
+        public String getProductconverted() {
+            return isproductconverted;
         }
 
         public void setProductName(String productName) {

@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,7 +48,7 @@ public abstract class add_product_Adapter extends RecyclerView.Adapter<add_produ
     List<add_product_POJO> itemList;
     Context context;
     Activity activity;
-    String count,name,sbrand,svendor,srate,sqty,sunit,sStock,sProid,sBrandid,sUnitid;
+    String count,name,sbrand,svendor,srate,sqty,sunit,sStock,sProid,sBrandid,sUnitid,sProductConverted;
     AlertDialog dialog;
     String feedback = "";
     String product_list;
@@ -92,7 +93,10 @@ public abstract class add_product_Adapter extends RecyclerView.Adapter<add_produ
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.add_product_holder,parent,false);
         return new ViewHolder(view);
     }
-
+    public void updateList(List<add_product_POJO> newList) {
+        this.itemList = newList;
+        notifyDataSetChanged();
+    }
     @Override
     public void onBindViewHolder(@NonNull add_product_Adapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
 
@@ -103,6 +107,16 @@ public abstract class add_product_Adapter extends RecyclerView.Adapter<add_produ
         holder.qty.setText(itemList.get(position).getQty());
         holder.unit.setText(itemList.get(position).getUnit());
         holder.Stock.setText(itemList.get(position).getStock());
+        Log.e("tag bind",itemList.get(position).getProductConverted()+"");
+        if(itemList.get(position).getProductConverted())
+        {
+            holder.isProductConverted.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            holder.isProductConverted.setVisibility(View.GONE);
+        }
+
 
 //        List<String> list = new ArrayList<>();
 //        list.add("");
@@ -124,6 +138,7 @@ public abstract class add_product_Adapter extends RecyclerView.Adapter<add_produ
         StringBuilder stringBuilder8 = new StringBuilder();
         StringBuilder stringBuilder9 = new StringBuilder();
         StringBuilder stringBuilder10 = new StringBuilder();
+        StringBuilder stringBuilder11 = new StringBuilder();
 
         for (int i = 0; i < itemList.size(); i++)
 
@@ -161,6 +176,8 @@ public abstract class add_product_Adapter extends RecyclerView.Adapter<add_produ
 
             stringBuilder10.append(itemList.get(i).getad_unit_id());
             stringBuilder10.append(",");
+            stringBuilder11.append(itemList.get(i).getProductConverted());
+            stringBuilder11.append(",");
         }
         name = String.valueOf(stringBuilder.deleteCharAt(stringBuilder.length() - 1));
         sbrand = String.valueOf(stringBuilder2.deleteCharAt(stringBuilder2.length() - 1));
@@ -172,6 +189,7 @@ public abstract class add_product_Adapter extends RecyclerView.Adapter<add_produ
         sProid = String.valueOf(stringBuilder8.deleteCharAt(stringBuilder8.length() - 1));
         sBrandid = String.valueOf(stringBuilder9.deleteCharAt(stringBuilder9.length() - 1));
         sUnitid = String.valueOf(stringBuilder10.deleteCharAt(stringBuilder10.length() - 1));
+        sProductConverted = String.valueOf(stringBuilder11.deleteCharAt(stringBuilder11.length() - 1));
 
         SharedPreferences sharedPreferences = context.getSharedPreferences("MySharedPref", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -186,6 +204,7 @@ public abstract class add_product_Adapter extends RecyclerView.Adapter<add_produ
         editor.putString("add_proId", sProid);
         editor.putString("add_brandId", sBrandid);
         editor.putString("add_unitId", sUnitid);
+        editor.putString("isProductConverted", sProductConverted);
 
         editor.apply();
         if (stringBuilder.length() > 1)Log.d("TAG", "onClick12: " + stringBuilder.deleteCharAt(stringBuilder.length() - 1));
@@ -230,6 +249,8 @@ public abstract class add_product_Adapter extends RecyclerView.Adapter<add_produ
         dailog_Unit = customLayout.findViewById(R.id.dailog_Unit);
         dailog_stock = customLayout.findViewById(R.id.dailog_stock);
         TextView add = customLayout.findViewById(R.id.add);
+        Switch switchProductConverted = customLayout.findViewById(R.id.product_converted_switch_togglebtn);
+        Log.d("TAG", "getProductConverted: " + itemList.get(i).getProductConverted());
 
         dialog_add_product.setText(itemList.get(i).getPname());
         filledTextField2.setText(itemList.get(i).getBrand());
@@ -238,7 +259,7 @@ public abstract class add_product_Adapter extends RecyclerView.Adapter<add_produ
         filledTextField5.setText(itemList.get(i).getQty());
         dailog_Unit.setText(itemList.get(i).getUnit());
         dailog_stock.setText(itemList.get(i).getStock());
-
+        switchProductConverted.setChecked(itemList.get(i).getProductConverted());
 
         //product_list
         add.setOnClickListener(new View.OnClickListener() {
@@ -270,8 +291,18 @@ public abstract class add_product_Adapter extends RecyclerView.Adapter<add_produ
                     SharedPreferences.Editor myEdit = sharedPreferences.edit();
 
                     itemList.remove(i);
-                    itemList.add(i,new add_product_POJO(dialog_add_product.getText().toString(), filledTextField2.getText().toString(), filledTextField3.getText().toString(), filledTextField4.getText().toString(), filledTextField5.getText().toString(), dailog_Unit.getText().toString(), dailog_stock.getText().toString(),ad_pro_id,ad_brand_id,ad_unit_id));
+                    itemList.add(i,new add_product_POJO(dialog_add_product.getText().toString(), filledTextField2.getText().toString(), filledTextField3.getText().toString(), filledTextField4.getText().toString(), filledTextField5.getText().toString(), dailog_Unit.getText().toString(), dailog_stock.getText().toString(),ad_pro_id,ad_brand_id,ad_unit_id,  switchProductConverted.isChecked()));
+                    for (int j = 0; j < itemList.size(); j++) {
+                        add_product_POJO item = itemList.get(j);
 
+                        Log.d("ITEM_LIST",
+                                "Index: " + j +
+                                        ", Name: " + item.getPname() +
+                                        ", Qty: " + item.getQty() +
+                                        ", Price: " + item.getRate() +
+                                        ", Converted: " + item.getProductConverted()+""
+                        );
+                    }
 
 //                    itemlist.add(new add_product_POJO(dialog_add_product.getText().toString(), filledTextField2.getText().toString(), filledTextField3.getText().toString(), filledTextField4.getText().toString(), filledTextField5.getText().toString(), dailog_Unit.getText().toString(), dailog_stock.getText().toString(),ad_pro_id,ad_brand_id,ad_unit_id));
 //                    add_product_adapter = new add_product_Adapter(itemlist, activity,activity);
@@ -921,11 +952,13 @@ public abstract class add_product_Adapter extends RecyclerView.Adapter<add_produ
         TextView unit;
         TextView Stock;
         ImageView fullLL;
+        ImageView isProductConverted;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             pname = itemView.findViewById(R.id.pname);
+            isProductConverted = itemView.findViewById(R.id.productconverted);
             brand = itemView.findViewById(R.id.brand);
             vendor = itemView.findViewById(R.id.vendor);
             rate = itemView.findViewById(R.id.rate);

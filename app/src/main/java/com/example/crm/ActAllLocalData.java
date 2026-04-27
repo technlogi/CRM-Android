@@ -256,7 +256,7 @@ String site_sdob=arAllData.get(countPos).getCUSTOMER_S_DOB();
             RequestBody.create(MediaType.parse("text/plain"), s_p2_site_position_list),
             RequestBody.create(MediaType.parse("text/plain"), ad_position_id/*sharedPreferences.getString("ad_position_id", "")*/),
 
-
+            RequestBody.create(MediaType.parse("text/plain"),"true"/* sharedPreferences.getString("add_product", "")*/),
             RequestBody.create(MediaType.parse("text/plain"),add_product/* sharedPreferences.getString("add_product", "")*/),
             RequestBody.create(MediaType.parse("text/plain"), add_proId/*sharedPreferences.getString("add_proId", "")*/),
             RequestBody.create(MediaType.parse("text/plain"), add_brand/*sharedPreferences.getString("add_brand", "")*/),
@@ -276,7 +276,7 @@ String site_sdob=arAllData.get(countPos).getCUSTOMER_S_DOB();
             RequestBody.create(MediaType.parse("text/plain"), site_son_site/*sharedPreferences.getString("site_son_site", "")*/),
             RequestBody.create(MediaType.parse("text/plain"), site_soff_site/*sharedPreferences.getString("site_soff_site", "")*/),
 
-
+            RequestBody.create(MediaType.parse("text/plain"),"true"),
             RequestBody.create(MediaType.parse("text/plain"), s_tv_date_picker_page2),
             RequestBody.create(MediaType.parse("text/plain"), s_tv_time),
             RequestBody.create(MediaType.parse("text/plain"), s_p4_remark),

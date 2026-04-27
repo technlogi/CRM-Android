@@ -201,7 +201,8 @@ for(int i=0;i<arProductNm.size();i++) {
                 arStock.get(i),
                 arProductId.get(i),
                 arBrandId.get(i),
-                arUNITID.get(i)
+                arUNITID.get(i),
+                false
         ));
 }
         add_product_adapter = new ShowAddProductAdapter(itemlist, ActDetailLocalData1.this, ActDetailLocalData1.this) {

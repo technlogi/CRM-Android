@@ -22,10 +22,13 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
+
             <TextView
                 android:id="@+id/pname"
+
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
 
                 android:fontFamily="@font/poppins_bold"
                 android:gravity="center_horizontal"
@@ -33,6 +36,15 @@
                 android:textColor="@color/black2"
                 android:textSize="16dp"
                 android:textStyle="bold" />
+            <ImageView
+                android:id="@+id/productconverted"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:visibility="gone"
+                android:layout_toRightOf="@+id/pname"
+                android:src="@drawable/ic_baseline_check_24"
+                app:tint="@color/teal_700" />
 
             <ImageView
                 android:id="@+id/cancel"

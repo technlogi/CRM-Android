@@ -726,7 +726,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_margin="10sp"
-                            android:hint="Address *"
+                            android:hint="Colony/Ward *"
                             app:boxStrokeColor="@color/main"
                             app:endIconTint="@color/main"
                             app:hintTextColor="@color/main">
@@ -816,7 +816,7 @@
                             android:layout_alignParentBottom="true"
                             android:layout_margin="10sp"
                             android:elevation="3dp"
-                            android:hint="Colony *"
+                            android:hint="Village/City *"
                             app:boxStrokeColor="@color/main"
                             app:endIconTint="@color/main"
                             app:hintTextColor="@color/main">
@@ -880,8 +880,8 @@
                                 android:layout_alignParentRight="true"
                                 android:layout_centerVertical="true"
                                 android:backgroundTint="@color/boder"
-                                android:buttonTint="@color/gray"
-                                android:thumbTint="@color/gray" />
+                                android:thumbTint="@color/switch_thumb"
+                                android:trackTint="@color/switch_track" />
 
                         </RelativeLayout>
 
@@ -1839,7 +1839,43 @@
                         android:layout_height="match_parent"
                         android:layout_margin="15dp"
                         android:orientation="vertical">
+                        <RelativeLayout
+                            android:id="@+id/is_site_completed"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:background="@drawable/box_wt_oe_border"
+                            android:orientation="horizontal">
 
+                            <EditText
+                                android:id="@+id/edt_is_site_completed"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:hint="Site Completed"
+                                android:inputType="text"
+                                android:maxLines="1"
+                                android:padding="15dp"
+                                android:textColor="@color/main"
+                                android:textColorHint="@color/main"
+                                android:textCursorDrawable="@drawable/custom_cursor"
+                                android:textSize="14sp" />
+
+
+                            <Switch
+                                android:id="@+id/site_completed_switch_togglebtn"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentRight="true"
+                                android:layout_centerVertical="true"
+                                android:backgroundTint="@color/boder"
+                                android:thumbTint="@color/switch_thumb"
+                                android:trackTint="@color/switch_track" />
+jad
+                        </RelativeLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -1847,6 +1883,7 @@
                             android:layout_height="wrap_content"
                             android:layout_margin="10dp"
                             android:elevation="3dp"
+                            android:id="@+id/txtnextvisitdate"
                             android:hint="Next Visit Date *"
                             app:boxStrokeColor="@color/main"
                             app:endIconTint="@color/white"
@@ -1868,6 +1905,7 @@
                             android:layout_alignParentBottom="true"
                             android:layout_margin="10dp"
                             android:elevation="3dp"
+                            android:id="@+id/txtnextvisittime"
                             android:hint="Next Visit Time *"
                             app:boxStrokeColor="@color/main"
                             app:endIconTint="@color/white"
@@ -1882,7 +1920,7 @@
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
-
+                            android:id="@+id/txtremark"
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

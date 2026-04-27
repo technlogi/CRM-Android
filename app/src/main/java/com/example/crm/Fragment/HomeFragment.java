@@ -186,29 +186,29 @@ container1 = view.findViewById(R.id.container1);
         return view;
     }
 
-    private void getBanner() {
+        private void getBanner() {
 
-        WebService.getClient().Slider_img().enqueue(new Callback<Slider_img_POJO>() {
-            @Override
-            public void onResponse(Call<Slider_img_POJO> call, Response<Slider_img_POJO> response) {
-//                multiimage = response.body().getResult().get();
+            WebService.getClient().Slider_img().enqueue(new Callback<Slider_img_POJO>() {
+                @Override
+                public void onResponse(Call<Slider_img_POJO> call, Response<Slider_img_POJO> response) {
+    //                multiimage = response.body().getResult().get();
 
-                ArrayList<SlideModel> slideModels;
-                slideModels = new ArrayList<>();
+                    ArrayList<SlideModel> slideModels;
+                    slideModels = new ArrayList<>();
 
-                for (int i = 0; i < response.body().getResult().size(); i++) {
-                    slideModels.add(new SlideModel(response.body().getResult().get(i).getImageSmall(), null));
+                    for (int i = 0; i < response.body().getResult().size(); i++) {
+                        slideModels.add(new SlideModel(response.body().getResult().get(i).getImageSmall(), null));
+                    }
+
+                    image_slider.setImageList(slideModels);
                 }
 
-                image_slider.setImageList(slideModels);
-            }
+                @Override
+                public void onFailure(Call<Slider_img_POJO> call, Throwable t) {
 
-            @Override
-            public void onFailure(Call<Slider_img_POJO> call, Throwable t) {
-
-            }
-        });
-    }
+                }
+            });
+        }
 
     private void RecyclerElectric() {
         progressBar.setVisibility(View.VISIBLE);

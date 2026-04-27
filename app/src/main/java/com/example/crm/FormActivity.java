@@ -110,6 +110,7 @@ import java.util.Currency;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -117,7 +118,6 @@ import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.http.Field;
 
 
 @RequiresApi(api = Build.VERSION_CODES.N)
@@ -156,6 +156,10 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
     String type_personname_list;
     TextView next1, next2, next3, next4, submit_next5, pre1, pre2, pre3, pre4, pre5, add_product, add_site_related_persion;
 
+
+    com.google.android.material.textfield.TextInputLayout txtnextvisitdate;
+    com.google.android.material.textfield.TextInputLayout txtnextvisittime;
+    com.google.android.material.textfield.TextInputLayout txtremark;
     ProgressDialog pro;
 
     TextView page1_back_btn, page2_back_btn, page3_back_btn;
@@ -294,7 +298,7 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
     TextInputEditText site_person_mobile;
     AutoCompleteTextView customer_dob_picker,site_peron_dob;
     final Calendar myCalendar= Calendar.getInstance();
-
+boolean isSiteCompleted=false;
 
     String P1Category = "IHB";
 
@@ -313,6 +317,7 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
     TextView contactModeSiteVisit, contactModeOnCall;
     private okhttp3.Response.Builder response;
 
+    @SuppressLint("MissingInflatedId")
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -327,6 +332,9 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
         TextView3 = findViewById(R.id.TextView3);
         TextView4 = findViewById(R.id.TextView4);
         TextView5 = findViewById(R.id.TextView5);
+        txtnextvisitdate = findViewById(R.id.txtnextvisitdate);
+        txtnextvisittime = findViewById(R.id.txtnextvisittime);
+        txtremark = findViewById(R.id.txtremark);
         edt_site_status = findViewById(R.id.edt_site_status);
         p1_customer_list_drownndown = findViewById(R.id.p1_customer_list_drownndown);
 
@@ -546,6 +554,24 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
         layout_page4 = findViewById(R.id.layout_page4);
         layout_page5 = findViewById(R.id.layout_page5);
 
+        Switch siteCompleted = findViewById(R.id.site_completed_switch_togglebtn);
+
+        siteCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                isSiteCompleted=true;
+                txtnextvisitdate.setVisibility(View.GONE);
+                txtnextvisittime.setVisibility(View.GONE);
+                txtremark.setVisibility(View.GONE);
+                Log.d("SWITCH", "ON");
+            } else {
+
+                isSiteCompleted=false;
+                txtnextvisitdate.setVisibility(View.VISIBLE);
+                txtnextvisittime.setVisibility(View.VISIBLE);
+                txtremark.setVisibility(View.VISIBLE);
+                Log.d("SWITCH", "OFF");
+            }
+        });
 
         //add old data in form(autofill)
         Intent i = getIntent();
@@ -556,6 +582,7 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
         customer_name = i.getStringExtra("customer_name");
 
         mobile_1 = i.getStringExtra("mobile_1");
+        mobile_2 = i.getStringExtra("mobile_2");
         mobile_2 = i.getStringExtra("mobile_2");
         mobile_3 = i.getStringExtra("mobile_3");
 
@@ -569,9 +596,9 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
 //        p1_customer_list.setText(Integer.parseInt(customer_name));
 //        p1_customer_list.setSelection(ad_position_id);
 //        p1_customer_list.setText(customer_name, false);
-        p1_mobile1.setText(mobile_1);
-        p1_mobile2.setText(mobile_2);
-        p1_mobile3.setText(mobile_3);
+       // p1_mobile1.setText(mobile_1);
+       // p1_mobile2.setText(mobile_2);
+       /// p1_mobile3.setText(mobile_3);
 
         addresss = i.getStringExtra("addresss");
         site_width = i.getStringExtra("site_width");
@@ -650,6 +677,15 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
                     if (response.body() != null) {
                         if(response.body().getResult().getProduct()!=null){
                             for (int i = 0; i < response.body().getResult().getProduct().size(); i++) {
+                                boolean isProductConverted=false;
+
+                                if ("true".equals(response.body().getResult().getProduct().get(i).getProductconverted())) {
+                                    Log.d("tag if", response.body().getResult().getProduct().get(i).getProductconverted());
+                                    isProductConverted = true;
+                                } else {
+                                    Log.d("tag else", response.body().getResult().getProduct().get(i).getProductconverted());
+                                    isProductConverted = false;
+                                }
                                 itemlist.add(new add_product_POJO(
                                         response.body().getResult().getProduct().get(i).getProductName(),
                                         response.body().getResult().getProduct().get(i).getBrand(),
@@ -660,12 +696,19 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
                                         response.body().getResult().getProduct().get(i).getStock(),
                                         response.body().getResult().getProduct().get(i).getProductId(),
                                         response.body().getResult().getProduct().get(i).getBrandId(),
-                                        response.body().getResult().getProduct().get(i).getUnitId()
+                                        response.body().getResult().getProduct().get(i).getUnitId(),
+                                        isProductConverted
+
+
                                 ));
                             }
                         }
 
+                        for (int i = 0; i < itemlist.size(); i++) {
+                            add_product_POJO item = itemlist.get(i);
 
+                            Log.d("ITEM_DATA", "ProductConverted: " + item.getProductConverted());
+                        }
                         add_product_adapter = new add_product_Adapter(itemlist, FormActivity.this, FormActivity.this) {
                             @Override
                             public void onItemChanged(List<add_product_POJO> list) {
@@ -911,15 +954,18 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
                         editor.putString("contact_mode", ContactMode);
                         editor.apply();
 
-//                        p4_remark.setText(response.body().getResult().getNextVisit().get(0).getRemark());
-//                        tv_date_picker_page2.setText(response.body().getResult().getNextVisit().get(0).getNextVisitDate());
-//                        tv_time.setText(response.body().getResult().getNextVisit().get(0).getNextVisitTime());
+                        p4_remark.setText(response.body().getResult().getNextVisit().get(0).getRemark());
+                        tv_date_picker_page2.setText(response.body().getResult().getNextVisit().get(0).getNextVisitDate());
+                        tv_time.setText(response.body().getResult().getNextVisit().get(0).getNextVisitTime());
 
-
-
-                        p4_remark.setText("");
-                        tv_date_picker_page2.setText("");
-                        tv_time.setText("");
+                        if("true".equals(response.body().getResult().getIsSiteCompleted()))
+                        {
+                            siteCompleted.setChecked(true);
+                        }
+                        else
+                        {
+                            siteCompleted.setChecked(false);
+                        }
 
                         p1_customer_list.setEnabled(false);
                         p1_customer_list_drownndown.setEnabled(false);
@@ -1736,35 +1782,54 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
         //customer name list
         p1_customer_list = findViewById(R.id.p1_customer_list);
 
-//            p1_customer_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//                @Override
-//                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//
-//                    ad_cusomer_name = autocompettextview.get(position);
-//                    ad_cusomer_id = autocompettextviewID.get(position);
-//                    ad_customer_phone1 = autocompettextviewphone1.get(position);
-//
-//                    p1_mobile1.setText(sharedPreferences.getString("ad_cusomer_phone1", ad_customer_phone1));
-//
-//
-//
-//                    Log.d("TAG", "ad_cusomer_name: " + ad_cusomer_name);
-//                    Log.d("TAG", "ad_cusomer_id: " + ad_cusomer_id);
-//
-//                    SharedPreferences location = getSharedPreferences("MySharedPref", MODE_PRIVATE);
-//                    SharedPreferences.Editor editor = location.edit();
-//
-//                    editor.putString("ad_cusomer_name", ad_cusomer_name);
-//                    editor.putString("ad_cusomer_id", ad_cusomer_id);
-//                    editor.putString("ad_customer_phone1" , ad_customer_phone1);
-//
-//                    editor.apply();
-//
-//                    String item = parent.getItemAtPosition(position).toString();//kkkkkkkkkkkkkkkk
-//                    feedback = item;
-//
-//                }
-//            });
+            p1_customer_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+Log.e("Hello ","Hello123456");
+                    ad_cusomer_name = autocompettextview.get(position);
+                    ad_cusomer_id = autocompettextviewID.get(position);
+
+                    ad_customer_phone1="";
+                    ad_customer_phone2="";
+                    ad_customer_phone3="";
+
+                    if( autocompettextviewphone1.get(position).length()>0)
+                    {
+                        ad_customer_phone1 = autocompettextviewphone1.get(position);
+                    }
+                    if( autocompettextviewphone2.get(position).length()>0)
+                    {
+                        ad_customer_phone2 = autocompettextviewphone2.get(position);
+                    }
+                    if( autocompettextviewphone3.get(position).length()>0)
+                    {
+                        ad_customer_phone3 = autocompettextviewphone3.get(position);
+                    }
+
+                  //  ad_customer_phone2 = autocompettextviewphone2.get(position);
+                   // ad_customer_phone3 = autocompettextviewphone3.get(position);
+                    Log.e("Hello ","Hello123 "+ad_customer_phone1);
+                    //Log.e("Hello ","Hello123 "+ad_customer_phone2);
+                    //Log.e("Hello ","Hello123 "+ad_customer_phone3);
+                    p1_mobile1.setText(ad_customer_phone1);
+                    p1_mobile2.setText(ad_customer_phone2);
+                    p1_mobile3.setText(ad_customer_phone3);
+                    Log.d("TAG", "ad_cusomer_name: " + ad_cusomer_name);
+                    Log.d("TAG", "ad_cusomer_id: " + ad_cusomer_id);
+
+                    SharedPreferences location = getSharedPreferences("MySharedPref", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = location.edit();
+
+                    editor.putString("ad_cusomer_name", ad_cusomer_name);
+                    editor.putString("ad_cusomer_id", ad_cusomer_id);
+
+                    editor.apply();
+
+                    String item = parent.getItemAtPosition(position).toString();//kkkkkkkkkkkkkkkk
+                    feedback = item;
+
+                }
+            });
 
         //colony name list
         p2_colony_list = findViewById(R.id.p2_colony_list);
@@ -1955,121 +2020,119 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
                     Log.d("TAG", "ad_sssite_person_id: " + sharedPreferences.getString("ad_site_person_id", ""));
 
                     if (CheckInternetConnection.checkInternetConnection(FormActivity.this)) {
-                        if (!flag) {   //for all data submit
+                        //for all data submit
+                        //                        WebService.getClient().sent_in_url_visit_form("api/crm/visit_form.php?"
+                        //                                + "visit_date=" + s_tv_date_picker + "&"
+                        //                                + "visit_time=" + s_tv_timee + "&"
+                        //                                + "market_agent_code=" + s_p1_agent_code + "&"
+                        //                                + "customer_list__id=" + sharedPreferences.getString("ad_cusomer_id", "") + "&"
+                        //                                + "c_name=" + s_p1_customer_list + "&"
+                        //                                + "mobile_1=" + s_p1_mobile1 + "&"
+                        //                                + "mobile_2=" + s_p1_mobile2 + "&"
+                        //                                + "mobile_3=" + s_p1_mobile3 + "&"
+                        //
+                        //                                + "addresss=" + s_p2_address + "&"
+                        //                                + "colony_list_id=" + sharedPreferences.getString("ad_colony_id", "") + "&"
+                        //                                + "colony=" + s_p2_colony_list + "&"
+                        //                                + "site_status=" + s_switch_togglebtn + "&"
+                        //                                + "Site_width=" + c_edt_weight + "&"
+                        //                                + "Site_Hight=" + s_edt_height + "&"
+                        //                                + "postion=" + s_p2_site_position_list + "&"
+                        //                                + "postion_list_id=" + sharedPreferences.getString("ad_position_id", "") + "&"
+                        //
+                        //                                + "product_name=" + sharedPreferences.getString("add_product", "") + "&"
+                        //                                + "product_id=" + sharedPreferences.getString("pro_id", "") + "&"
+                        //                                + "brand=" + sharedPreferences.getString("ad_brand_name", "") + "&"
+                        //                                + "brand_id=" + sharedPreferences.getString("ad_brand_id", "") + "&"
+                        //                                + "existing_buy_shop=" + sharedPreferences.getString("add_vendor", "") + "&"
+                        //                                + "existing_buy_rate=" + sharedPreferences.getString("add_rate", "") + "&"
+                        //                                + "required_qty=" + sharedPreferences.getString("add_qty", "") + "&"
+                        //                                + "unit=" + sharedPreferences.getString("ad_unit_name", "") + "&"
+                        //                                + "unit_id=" + sharedPreferences.getString("ad_unit_id", "") + "&"
+                        //                                + "stock=" + sharedPreferences.getString("add_Stock", "") + "&"
+                        //
+                        //                                + "type_of_person=" + sharedPreferences.getString("site_sperson", "") + "&"
+                        //                                + "type_of_person_id=" + sharedPreferences.getString("ad_site_person_id", "") + "&"
+                        //                                + "name=" + sharedPreferences.getString("site_sname", "") + "&"
+                        //                                + "contact_no=" + sharedPreferences.getString("site_scontact", "") + "&"
+                        //                                + "ON_Site=" + sharedPreferences.getString("site_son_site", "") + "&"
+                        //                                + "OFF_Site=" + sharedPreferences.getString("site_soff_site", "") + "&"
+                        //
+                        //                                + "next_visit_date=" + s_tv_date_picker_page2 + "&"
+                        //                                + "next_visit_time=" + s_tv_time + "&"
+                        //                                + "remark=" + s_p4_remark + "&"
+                        //
+                        //                                + "form_fillup_latittude=" + sharedPreferences.getString("latitude", "") + "&"
+                        //                                + "form_fillup_longitude=" + sharedPreferences.getString("longitude", "") + "&"
+                        //
+                        //                                + "image_upload_latitude=" + sharedPreferences.getString("latitude", "") + "&"
+                        //                                + "image_upload_longitude=" + sharedPreferences.getString("longitude", "") + "&"
+                        //                                + "user_id=" + sharedPreferences.getString("user_id", "")
+                        //
+                        //
+                        //                        ).enqueue(new Callback<visit_form_POJO>() {
+                        //                            @Override
+                        //                            public void onResponse(Call<visit_form_POJO> call, Response<visit_form_POJO> response) {
+                        //
+                        //                                Toast.makeText(FormActivity.this, "", Toast.LENGTH_SHORT).show();
+                        //
+                        //                            }
+                        //
+                        //                            @Override
+                        //                            public void onFailure(Call<visit_form_POJO> call, Throwable t) {
+                        //
+                        //                            }
+                        //                        });
+                        //official
+                        if (!flag) WebService.getClient().visit_form(
+                                RequestBody.create(MediaType.parse("text/plain"), s_tv_date_picker),
+                                RequestBody.create(MediaType.parse("text/plain"), s_tv_timee),
+                                RequestBody.create(MediaType.parse("text/plain"), s_p1_agent_code),
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("ad_cusomer_id", "")),
+                                RequestBody.create(MediaType.parse("text/plain"), s_p1_customer_list),
+                                RequestBody.create(MediaType.parse("text/plain"), s_p1_mobile1),
+                                RequestBody.create(MediaType.parse("text/plain"), s_p1_mobile2),
+                                RequestBody.create(MediaType.parse("text/plain"), s_p1_mobile3),
 
-//                        WebService.getClient().sent_in_url_visit_form("api/crm/visit_form.php?"
-//                                + "visit_date=" + s_tv_date_picker + "&"
-//                                + "visit_time=" + s_tv_timee + "&"
-//                                + "market_agent_code=" + s_p1_agent_code + "&"
-//                                + "customer_list__id=" + sharedPreferences.getString("ad_cusomer_id", "") + "&"
-//                                + "c_name=" + s_p1_customer_list + "&"
-//                                + "mobile_1=" + s_p1_mobile1 + "&"
-//                                + "mobile_2=" + s_p1_mobile2 + "&"
-//                                + "mobile_3=" + s_p1_mobile3 + "&"
-//
-//                                + "addresss=" + s_p2_address + "&"
-//                                + "colony_list_id=" + sharedPreferences.getString("ad_colony_id", "") + "&"
-//                                + "colony=" + s_p2_colony_list + "&"
-//                                + "site_status=" + s_switch_togglebtn + "&"
-//                                + "Site_width=" + c_edt_weight + "&"
-//                                + "Site_Hight=" + s_edt_height + "&"
-//                                + "postion=" + s_p2_site_position_list + "&"
-//                                + "postion_list_id=" + sharedPreferences.getString("ad_position_id", "") + "&"
-//
-//                                + "product_name=" + sharedPreferences.getString("add_product", "") + "&"
-//                                + "product_id=" + sharedPreferences.getString("pro_id", "") + "&"
-//                                + "brand=" + sharedPreferences.getString("ad_brand_name", "") + "&"
-//                                + "brand_id=" + sharedPreferences.getString("ad_brand_id", "") + "&"
-//                                + "existing_buy_shop=" + sharedPreferences.getString("add_vendor", "") + "&"
-//                                + "existing_buy_rate=" + sharedPreferences.getString("add_rate", "") + "&"
-//                                + "required_qty=" + sharedPreferences.getString("add_qty", "") + "&"
-//                                + "unit=" + sharedPreferences.getString("ad_unit_name", "") + "&"
-//                                + "unit_id=" + sharedPreferences.getString("ad_unit_id", "") + "&"
-//                                + "stock=" + sharedPreferences.getString("add_Stock", "") + "&"
-//
-//                                + "type_of_person=" + sharedPreferences.getString("site_sperson", "") + "&"
-//                                + "type_of_person_id=" + sharedPreferences.getString("ad_site_person_id", "") + "&"
-//                                + "name=" + sharedPreferences.getString("site_sname", "") + "&"
-//                                + "contact_no=" + sharedPreferences.getString("site_scontact", "") + "&"
-//                                + "ON_Site=" + sharedPreferences.getString("site_son_site", "") + "&"
-//                                + "OFF_Site=" + sharedPreferences.getString("site_soff_site", "") + "&"
-//
-//                                + "next_visit_date=" + s_tv_date_picker_page2 + "&"
-//                                + "next_visit_time=" + s_tv_time + "&"
-//                                + "remark=" + s_p4_remark + "&"
-//
-//                                + "form_fillup_latittude=" + sharedPreferences.getString("latitude", "") + "&"
-//                                + "form_fillup_longitude=" + sharedPreferences.getString("longitude", "") + "&"
-//
-//                                + "image_upload_latitude=" + sharedPreferences.getString("latitude", "") + "&"
-//                                + "image_upload_longitude=" + sharedPreferences.getString("longitude", "") + "&"
-//                                + "user_id=" + sharedPreferences.getString("user_id", "")
-//
-//
-//                        ).enqueue(new Callback<visit_form_POJO>() {
-//                            @Override
-//                            public void onResponse(Call<visit_form_POJO> call, Response<visit_form_POJO> response) {
-//
-//                                Toast.makeText(FormActivity.this, "", Toast.LENGTH_SHORT).show();
-//
-//                            }
-//
-//                            @Override
-//                            public void onFailure(Call<visit_form_POJO> call, Throwable t) {
-//
-//                            }
-//                        });
-
-
-
-                            //official
-                            WebService.getClient().visit_form(
-                                    RequestBody.create(MediaType.parse("text/plain"), s_tv_date_picker),
-                                    RequestBody.create(MediaType.parse("text/plain"), s_tv_timee),
-                                    RequestBody.create(MediaType.parse("text/plain"), s_p1_agent_code),
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("ad_cusomer_id", "")),
-                                    RequestBody.create(MediaType.parse("text/plain"), s_p1_customer_list),
-                                    RequestBody.create(MediaType.parse("text/plain"), s_p1_mobile1),
-                                    RequestBody.create(MediaType.parse("text/plain"), s_p1_mobile2),
-                                    RequestBody.create(MediaType.parse("text/plain"), s_p1_mobile3),
-
-                                    RequestBody.create(MediaType.parse("text/plain"), s_p2_address),
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("ad_colony_id", "")),
-                                    RequestBody.create(MediaType.parse("text/plain"), s_p2_colony_list),
-                                    RequestBody.create(MediaType.parse("text/plain"), s_switch_togglebtn),
-                                    RequestBody.create(MediaType.parse("text/plain"), c_edt_weight),
-                                    RequestBody.create(MediaType.parse("text/plain"), s_edt_height),
-                                    RequestBody.create(MediaType.parse("text/plain"), s_p2_site_position_list),
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("ad_position_id", "")),
+                                RequestBody.create(MediaType.parse("text/plain"), s_p2_address),
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("ad_colony_id", "")),
+                                RequestBody.create(MediaType.parse("text/plain"), s_p2_colony_list),
+                                RequestBody.create(MediaType.parse("text/plain"), s_switch_togglebtn),
+                                RequestBody.create(MediaType.parse("text/plain"), c_edt_weight),
+                                RequestBody.create(MediaType.parse("text/plain"), s_edt_height),
+                                RequestBody.create(MediaType.parse("text/plain"), s_p2_site_position_list),
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("ad_position_id", "")),
 
 
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_product", "")),//product name
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_proId", "")),
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_brand", "")),//brand
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_brandId", "")),
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_vendor", "")),//vendor
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_rate", "")),//rate
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_qty", "")),//qty
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_unit", "")),//unit
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_unitId", "")),
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_Stock", "")),//stock
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("isProductConverted", "")),//product converted
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_product", "")),//product name
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_proId", "")),
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_brand", "")),//brand
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_brandId", "")),
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_vendor", "")),//vendor
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_rate", "")),//rate
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_qty", "")),//qty
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_unit", "")),//unit
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_unitId", "")),
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_Stock", "")),//stock
 
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("site_sperson", "")),//related
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("site_sad_site_person_id", "")),
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("site_sname", "")),//name
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("site_sad_site_person_idname", "")),//
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("site_scontact", "")),// contact
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("site_son_site", "")),
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("site_soff_site", "")),
-
-
-                                    RequestBody.create(MediaType.parse("text/plain"), s_tv_date_picker_page2),
-                                    RequestBody.create(MediaType.parse("text/plain"), s_tv_time),
-                                    RequestBody.create(MediaType.parse("text/plain"), s_p4_remark),
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("site_sperson", "")),//related
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("site_sad_site_person_id", "")),
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("site_sname", "")),//name
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("site_sad_site_person_idname", "")),//
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("site_scontact", "")),// contact
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("site_son_site", "")),
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("site_soff_site", "")),
 
 
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("form_latitude", "")),
-                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("form_longitude", "")),
+                                RequestBody.create(MediaType.parse("text/plain"), isSiteCompleted+""),
+                                RequestBody.create(MediaType.parse("text/plain"), s_tv_date_picker_page2),
+                                RequestBody.create(MediaType.parse("text/plain"), s_tv_time),
+                                RequestBody.create(MediaType.parse("text/plain"), s_p4_remark),
+
+
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("form_latitude", "")),
+                                RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("form_longitude", "")),
 
                                     RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("img_latitude", "")),
                                     RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("img_longitude", "")),
@@ -2088,16 +2151,16 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
 
 //                                    Toast.makeText(FormActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
 
-                                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                                        editor.putString("img_latitude", "");
-                                        editor.putString("img_longitude", "");
-                                        editor.putString("form_latitude", "");
-                                        editor.putString("form_longitude", "");
-                                        editor.apply();
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString("img_latitude", "");
+                                    editor.putString("img_longitude", "");
+                                    editor.putString("form_latitude", "");
+                                    editor.putString("form_longitude", "");
+                                    editor.apply();
 
-                                        showAlertDialogButtonClicked1(view);
+                                    showAlertDialogButtonClicked1(view);
 
-                                        //Toast.makeText(MakenewApplicationActivity.this, response.body().getStatusMessage(), Toast.LENGTH_SHORT).show();
+                                    //Toast.makeText(MakenewApplicationActivity.this, response.body().getStatusMessage(), Toast.LENGTH_SHORT).show();
 //                            Dialog dialog = new Dialog(FormActivity.this, R.style.DialogStyal);
 //                            dialog.setContentView(R.layout.submut_applicayion_dilog_layout);
 //                            ImageView close = dialog.findViewById(R.id.close);
@@ -2110,22 +2173,18 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
 //                                    startActivity(new Intent(FormActivity.this, MainActivity.class));
 //                                }
 //                            });
-                                        dialog.show();
-                                    } else {
+                                    dialog.show();
+                                } else {
 //                                    Toast.makeText(FormActivity.this, "Data Not Submitted", Toast.LENGTH_SHORT).show();
-                                    }
                                 }
+                            }
 
-                                @Override
-                                public void onFailure(Call<visit_form_POJO> call, Throwable t) {
-                                    pro.dismiss();
+                            @Override
+                            public void onFailure(Call<visit_form_POJO> call, Throwable t) {
+                                pro.dismiss();
 //                                Toast.makeText(FormActivity.this, t.toString(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-
-
-
-                        }
+                            }
+                        });
                         else {//for edit data
                             flag2 = false;
 
@@ -2153,6 +2212,7 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
 //                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("ad_position_id", "")),
 
 
+                                    RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("isProductConverted", "")),//product converted
                                     RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_product", "")),
                                     RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_proId", "")),
                                     RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("add_brand", "")),
@@ -2172,7 +2232,7 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
                                     RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("site_son_site", "")),
                                     RequestBody.create(MediaType.parse("text/plain"), sharedPreferences.getString("site_soff_site", "")),
 
-
+                                    RequestBody.create(MediaType.parse("text/plain"), isSiteCompleted+""),
                                     RequestBody.create(MediaType.parse("text/plain"), s_tv_date_picker_page2),
                                     RequestBody.create(MediaType.parse("text/plain"), s_tv_time),
                                     RequestBody.create(MediaType.parse("text/plain"), s_p4_remark),
@@ -3031,20 +3091,40 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
                     adapterItems2 = new ArrayAdapter<String>(FormActivity.this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, autocompettextview);
                     p1_customer_list.setAdapter(adapterItems2);
                     adapterItems2.notifyDataSetChanged();
-//                    if (autocompettextviewphone1 != null ){
-//
-//                       // p1_mobile1.setText(autocompettextviewphone1.indexOf());
-//                        p1_mobile1.setText(autocompettextviewphone1.toString());
-//                        Toast.makeText(FormActivity.this, "Phone number is"+autocompettextviewphone1, Toast.LENGTH_SHORT).show();
-//                    }
-//                    if (autocompettextviewphone2!=null){
-//                        p1_mobile2.setText(autocompettextviewphone2.toString());
-//                        Toast.makeText(FormActivity.this, "Phone number is"+autocompettextviewphone2, Toast.LENGTH_SHORT).show();
-//                    }
-//                    if (autocompettextviewphone3!=null){
+                if(p1_customer_list_drownndown.isEnabled())
+                {
+                    if (autocompettextviewphone1!=null ){
+
+                        if(autocompettextviewphone1.size()>0)
+                        {
+                           //p1_mobile1.setText(autocompettextviewphone1.get(0));
+                        }
+                       // p1_mobile1.setText(autocompettextviewphone1.toString());
+
+                        //    p1_mobile1.setText(autocompettextviewphone1.toString());
+                       // Log.e("phonenumber",)
+                        //Toast.makeText(FormActivity.this, "Phone number is"+autocompettextviewphone1, Toast.LENGTH_SHORT).show();
+                    }
+                    if (autocompettextviewphone2!=null){
+                       // p1_mobile2.setText(autocompettextviewphone2.toString());
+                        if(autocompettextviewphone2.size()>0)
+                        {
+                            p1_mobile2.setText(autocompettextviewphone2.get(0));
+                        }
+
+                        //Toast.makeText(FormActivity.this, "Phone number is"+autocompettextviewphone2, Toast.LENGTH_SHORT).show();
+                    }
+                    if (autocompettextviewphone3!=null){
 //                        p1_mobile3.setText(autocompettextviewphone3.toString());
-//                        Toast.makeText(FormActivity.this, "Phone number is"+autocompettextviewphone3, Toast.LENGTH_SHORT).show();
-//                    }
+                        if(autocompettextviewphone3.size()>0)
+                        {
+                            p1_mobile3.setText(autocompettextviewphone3.get(0));
+                        }
+
+//Toast.makeText(FormActivity.this, "Phone number is"+autocompettextviewphone3, Toast.LENGTH_SHORT).show();
+                    }
+                }
+
 
                 } else {
 
@@ -3620,12 +3700,15 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
         dialog.show();
         dialog.setCanceledOnTouchOutside(false);
     }
+    boolean isProductConverted=false;
 
     public void showAlertDialogButtonClicked2(View view) {
+
 
         AlertDialog.Builder builder = new AlertDialog.Builder(FormActivity.this, R.style.CustomAlertDialog);
         final View customLayout = getLayoutInflater().inflate(R.layout.add_product_dialog, null);
         builder.setView(customLayout);
+
 
         dialog_add_product = customLayout.findViewById(R.id.dialog_add_product);
         filledTextField2 = customLayout.findViewById(R.id.filledTextField2);
@@ -3635,6 +3718,17 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
         dailog_Unit = customLayout.findViewById(R.id.dailog_Unit);
         dailog_stock = customLayout.findViewById(R.id.dailog_stock);
         TextView add = customLayout.findViewById(R.id.add);
+
+        Switch switchProductConverted = customLayout.findViewById(R.id.product_converted_switch_togglebtn);
+
+        switchProductConverted.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            isProductConverted=isChecked;
+            if (isChecked) {
+                Log.d("SWITCH", "Evening Mode ON");
+            } else {
+                Log.d("SWITCH", "Evening Mode OFF");
+            }
+        });
 
         //product_list
         add.setOnClickListener(new View.OnClickListener() {
@@ -3653,18 +3747,24 @@ public class FormActivity extends AppCompatActivity implements LocationListener 
                     SharedPreferences sharedPreferences = getSharedPreferences("MySharedPref", Context.MODE_PRIVATE);
                     SharedPreferences.Editor myEdit = sharedPreferences.edit();
 
-                    itemlist.add(new add_product_POJO(dialog_add_product.getText().toString(), filledTextField2.getText().toString(), filledTextField3.getText().toString(), filledTextField4.getText().toString(), filledTextField5.getText().toString(), dailog_Unit.getText().toString(), dailog_stock.getText().toString(),ad_pro_id,ad_brand_id,ad_unit_id));
+                    itemlist.add(new add_product_POJO(dialog_add_product.getText().toString(), filledTextField2.getText().toString(), filledTextField3.getText().toString(), filledTextField4.getText().toString(), filledTextField5.getText().toString(), dailog_Unit.getText().toString(), dailog_stock.getText().toString(),ad_pro_id,ad_brand_id,ad_unit_id,isProductConverted));
                     add_product_adapter = new add_product_Adapter(itemlist, FormActivity.this, FormActivity.this) {
                         @Override
                         public void onItemChanged(List<add_product_POJO> list) {
-                            itemlist.clear();
-                            itemlist.addAll(list);
-                            add_product_adapter.notifyDataSetChanged();
+
+                          //  itemlist.clear();
+
+//                            itemlist.addAll(list);
+                            itemlist = new ArrayList<>(list);
+
+                            add_product_adapter.updateList(list);
+
+                          //  add_product_adapter.notifyDataSetChanged();
 
                         }
                     };
                     rec_product.setAdapter(add_product_adapter);
-                    add_product_adapter.notifyDataSetChanged();
+                   // add_product_adapter.notifyDataSetChanged();
                     dialog.dismiss();
                 }
 

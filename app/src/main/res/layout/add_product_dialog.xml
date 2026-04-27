@@ -44,12 +44,52 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_margin="10dp"
-                    android:orientation="vertical">
 
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:orientation="vertical">
+                    <RelativeLayout
+                        android:id="@+id/rl_site_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@drawable/box_wt_oe_border"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/edt_site_status"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:hint="Product Converted"
+                            android:inputType="text"
+                            android:maxLines="1"
+                            android:padding="15dp"
+                            android:textColor="@color/main"
+                            android:textColorHint="@color/main"
+                            android:textCursorDrawable="@drawable/custom_cursor"
+                            android:textSize="14sp" />
+
+
+                        <Switch
+                            android:id="@+id/product_converted_switch_togglebtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:backgroundTint="@color/boder"
+                            android:thumbTint="@color/switch_thumb"
+                            android:trackTint="@color/switch_track" />
+
+                    </RelativeLayout>
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
@@ -61,6 +101,8 @@
                         app:boxStrokeColor="@color/main"
                         app:endIconTint="@color/main"
                         app:hintTextColor="@color/main">
+
+
 
                         <AutoCompleteTextView
                             android:id="@+id/dialog_add_product"
@@ -113,7 +155,7 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    //bramd
+
                     <!--                <com.google.android.material.textfield.TextInputLayout-->
                     <!--                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
                     <!--                    android:layout_width="match_parent"-->

@@ -5,6 +5,12 @@ import android.widget.TextView;
 public class add_product_POJO {
 
     String pname;
+    boolean isProductConverted;
+
+    public boolean getProductConverted()
+    {
+        return  isProductConverted;
+    }
 
     public String getPname() {
         return pname;
@@ -46,7 +52,7 @@ public class add_product_POJO {
         this.qty = qty;
     }
 
-    public add_product_POJO(String pname, String brand, String vendor, String rate, String qty,String unit,String stock,String ad_pro_id,String ad_brand_id,String ad_unit_id) {
+    public add_product_POJO(String pname, String brand, String vendor, String rate, String qty,String unit,String stock,String ad_pro_id,String ad_brand_id,String ad_unit_id,boolean isProductConverted) {
         this.pname = pname;
         this.brand = brand;
         this.vendor = vendor;
@@ -57,8 +63,11 @@ public class add_product_POJO {
         this.ad_pro_id = ad_pro_id;
         this.ad_brand_id =ad_brand_id;
         this.ad_unit_id = ad_unit_id;
+        this.isProductConverted=isProductConverted;
     }
-
+    public void setProductConverted(boolean isProductConverted) {
+        this.isProductConverted = isProductConverted;
+    }
     public String getUnit() {
         return unit;
     }

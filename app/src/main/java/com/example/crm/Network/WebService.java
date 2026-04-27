@@ -71,7 +71,7 @@ public class WebService {
 //             Post post = gson.fromJson(reader, Post.class);
 
             Retrofit client = new Retrofit.Builder()
-                    .baseUrl("http://13.200.250.138/erp/")
+                    .baseUrl("http://13.232.174.25/erp/")
 
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .client(okclient)
@@ -203,6 +203,7 @@ public class WebService {
                 @Part("postion_list_id") RequestBody postion_list_id,
 
 
+                @Part("is_product_converted") RequestBody isProductConverted,//page3
                 @Part("product_name") RequestBody product_name,//page3
                 @Part("product_id") RequestBody product_id,//page3
                 @Part("brand") RequestBody brand,
@@ -222,6 +223,7 @@ public class WebService {
                 @Part("ON_Site") RequestBody ON_Site,
                 @Part("OFF_Site") RequestBody OFF_Site,
 
+                @Part("is_site_completed") RequestBody isSiteCompleted,//page5
                 @Part("next_visit_date") RequestBody next_visit_date,//page5
                 @Part("next_visit_time") RequestBody next_visit_time,
                 @Part("remark") RequestBody remark,
@@ -353,6 +355,7 @@ public class WebService {
                 @Part("postion_list_id") RequestBody postion_list_id,
 
 
+                @Part("is_product_converted") RequestBody isProductConverted,//page3
                 @Part("product_name") RequestBody product_name,//page3
                 @Part("product_id") RequestBody product_id,//page3
                 @Part("brand") RequestBody brand,
@@ -372,6 +375,7 @@ public class WebService {
                 @Part("ON_Site") RequestBody ON_Site,
                 @Part("OFF_Site") RequestBody OFF_Site,
 
+                @Part("is_site_completed") RequestBody isSiteCompleted,//page5
                 @Part("next_visit_date") RequestBody next_visit_date,//page5
                 @Part("next_visit_time") RequestBody next_visit_time,
                 @Part("remark") RequestBody remark,
